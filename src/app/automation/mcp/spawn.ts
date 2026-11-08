@@ -59,6 +59,7 @@ const DEV_AUTOMATION_AUTH_TOKEN =
   import.meta.env.DEV && typeof __OPENPENCIL_LOCAL_AUTOMATION_TOKEN__ === 'string'
     ? __OPENPENCIL_LOCAL_AUTOMATION_TOKEN__
     : null
+const DEV_MCP_RESTART_ROUTE = DEV_MCP_RESTART_PATH.replace(/^\/+/, '')
 const noop = () => undefined
 const MAX_STARTUP_STDERR_LENGTH = 8_192
 
@@ -415,7 +416,7 @@ async function configureDevMCP(): Promise<AutomationServerHandle> {
     disabledTools: [...disabledMCPTools.value],
     scope: mcpScope()
   }
-  const response = await fetch(DEV_MCP_RESTART_PATH, {
+  const response = await fetch(`${import.meta.env.BASE_URL}${DEV_MCP_RESTART_ROUTE}`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${DEV_AUTOMATION_AUTH_TOKEN}`,

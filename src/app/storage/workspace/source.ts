@@ -25,6 +25,8 @@ export function createStorageWorkspaceSource(
 
     async refresh(): Promise<StorageDocument[] | null> {
       const providerID = activeStorageProviderID.value
+      console.info('[workspace.refresh] providerID x', providerID)
+
       const configured = await isStorageConfigured(providerID)
       const localStore = getLocalCanvasStore()
       const local = (await localStore.listMetas(true)).filter(
@@ -39,12 +41,13 @@ export function createStorageWorkspaceSource(
             updatedAt: metadata.updatedAt,
             metadataAuthoritative: true
           }))
-        if (activeStorageProviderID.value !== providerID) return null
-        onSnapshot({ documents, configured })
-        return documents
-      }
+      if (activeStorageProviderID.value !== providerID) return null
+      onSnapshot({ documents, configured })
+      return documents
+    }
+    console.info('[workspace.refresh] providerID', providerID)
 
-      const remote = await createActiveStorageAdapter(providerID).listDocuments()
+    const remote = await createActiveStorageAdapter(providerID).listDocuments()
       const reconciliation = reconcileStorageDocuments(local, remote)
       for (const id of reconciliation.localIdsToPurge) await localStore.remove(id)
       for (const document of reconciliation.remoteDocumentsToSeed) {

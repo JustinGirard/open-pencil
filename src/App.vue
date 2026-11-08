@@ -14,6 +14,7 @@ import { useAppTheme } from '@/app/shell/theme'
 import { toast } from '@/app/shell/ui'
 import { useRestartApprovals } from '@/app/shell/updater/approvals'
 import { scheduleStartupUpdateCheck } from '@/app/shell/updater/check'
+import FragmintSaveAsDialog from '@/app/plugins/fragmint/views/FragmintSaveAsDialog.vue'
 import { kickSyncEngine } from '@/app/storage/sync'
 import { prepareForReload } from '@/app/tabs'
 import UnsavedChangesDialog from '@/components/document/UnsavedChangesDialog.vue'
@@ -30,7 +31,7 @@ import VoiceCallAudio from '@/components/voice-call/VoiceCallAudio.vue'
 const { updates, locale } = useI18n()
 
 useHead({
-  titleTemplate: (title) => (title ? `${title} — OpenPencil` : 'OpenPencil'),
+  titleTemplate: (title) => (title ? `${title} — Fragmint` : 'Fragmint'),
   htmlAttrs: {
     lang: locale,
     'data-motion': computed(() => (animationsEnabled.value ? 'full' : 'off'))
@@ -65,6 +66,7 @@ onMounted(() => {
       <PublishLibraryDialog />
       <LibraryUpdateReviewDialog />
       <UsageStatsPrompt />
+      <FragmintSaveAsDialog />
       <Toaster />
       <VoiceCallAudio />
     </TooltipProvider>

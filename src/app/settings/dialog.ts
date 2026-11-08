@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-export type SettingsSection =
+export type BuiltInSettingsSection =
   | 'general'
   | 'toolbar'
   | 'ai'
@@ -11,6 +11,7 @@ export type SettingsSection =
   | 'tools'
   | 'media'
   | 'storage'
+export type SettingsSection = BuiltInSettingsSection | string
 
 export const settingsDialogOpen = ref(false)
 export const settingsDialogSection = ref<SettingsSection>('general')

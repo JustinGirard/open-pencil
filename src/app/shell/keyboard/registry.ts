@@ -10,7 +10,11 @@ import { requestRenameSelection } from '@/app/editor/selection/rename-dialog'
 import { TOOL_SHORTCUTS } from '@/app/editor/session'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { setSnappingPreference } from '@/app/settings/preferences/apply'
-import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'
+import {
+  isButtonActivation,
+  isEditing,
+  isFragmintUnityCanvasFocused
+} from '@/app/shell/keyboard/focus'
 import { bindSpaceHandTool } from '@/app/shell/keyboard/space-tool'
 import type {
   KeyboardShortcutOptions,
@@ -123,6 +127,7 @@ function shouldIgnoreShortcut(
     originatedInOverlay(event, history) ||
     isEditing(event) ||
     options.inputFocused.value ||
+    isFragmintUnityCanvasFocused(event) ||
     !!options.store.state.editingTextId ||
     !!options.store.state.numberFieldFocused
   )

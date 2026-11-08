@@ -48,6 +48,7 @@ export function createActiveStorageAdapter(
   providerID: StorageProviderID = activeStorageProviderID.value,
   profileID = 'default'
 ): StorageAdapter {
+  console.info('[Storage] creating adapter', { providerId: providerID })
   return storageProviderRegistry.createAdapter(providerID, {
     preferences: readStoragePreferences(providerID),
     credentials: appCredentialServices.resolver,

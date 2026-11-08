@@ -14,6 +14,8 @@ import type { SceneNode } from '@open-pencil/scene-graph'
 import { PageListRoot, useFlatReorderDrag, useI18n, useInlineRename } from '@open-pencil/vue'
 
 import { useActiveEditorStoreRef } from '@/app/editor/active-store'
+import { dispatchPluginEvent } from '@/app/plugins/base/runtime'
+import { plugins } from '@/app/plugins/pluginRegistry'
 import { presenceByPage } from '@/app/presence/registry'
 import { appPreferences } from '@/app/settings/preferences/store'
 import PageIssueBadge from '@/components/design-check/PageIssueBadge.vue'
@@ -100,6 +102,14 @@ function setupPageRowRef(
   currentMovePage.value = movePage
   pageReorder.setupItem(value instanceof HTMLElement ? value : null, () => ({ id: pg.id }))
 }
+
+function selectPage(pageId: string, switchPage: (pageId: string) => void) {
+  void dispatchPluginEvent(plugins, {
+    type: 'asset:selected',
+    payload: { kind: 'page', id: pageId }
+  })
+  switchPage(pageId)
+}
 </script>
 
 <template>
@@ -156,7 +166,7 @@ function setupPageRowRef(
                   <button
                     data-test-id="pages-item"
                     :class="pageStyles(pg, currentPageId).item()"
-                    @click="actions.switch(pg.id)"
+                    @click="selectPage(pg.id, actions.switch)"
                     @dblclick="startRename(pg, actions.rename)"
                   >
                     <icon-lucide-file :class="pageStyles(pg, currentPageId).icon()" />

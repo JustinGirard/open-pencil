@@ -16,7 +16,8 @@ import {
   forgetRecentDocument,
   loadRecentFileThumbnail,
   recentFiles,
-  type RecentDocument
+  type RecentDocument,
+  type RecentStorageDocument
 } from '@/app/recent-files'
 import { useCredentialSettings } from '@/app/settings/credentials/preferences/use'
 import { openSettingsDialog } from '@/app/settings/dialog'
@@ -43,6 +44,8 @@ const workspace = useDocumentWorkspace<RecentDocument>({
       return recentFiles.value
     },
     loadPreview(documentId) {
+      console.info('[workspace.refresh] documentId xx', document.documentId)
+
       const document = recentFiles.value.find((candidate) => candidate.id === documentId)
       if (!document) return Promise.resolve(null)
       if (document.kind === 'local') return loadRecentFileThumbnail(document.path)
@@ -139,7 +142,8 @@ async function openRecent(document: RecentDocument): Promise<void> {
         id: document.documentId,
         name: document.name,
         updatedAt: document.updatedAt
-      }
+      },
+      (document as RecentStorageDocument).providerId
     )
   } catch (error) {
     forgetRecentDocument(document.id)

@@ -1,3 +1,10 @@
+function isFragmintUnityCanvasElement(element: Element | null | undefined): boolean {
+  return (
+    element instanceof HTMLCanvasElement &&
+    element.dataset.fragmintUnityCanvas === '1'
+  )
+}
+
 function isEditableTarget(target: EventTarget | null | undefined): boolean {
   return (
     target instanceof HTMLInputElement ||
@@ -14,6 +21,13 @@ export function isButtonActivation(event: KeyboardEvent): boolean {
 
 export function isEditing(event: Event) {
   return event.composedPath().some(isEditableTarget)
+}
+
+export function isFragmintUnityCanvasFocused(event: Event): boolean {
+  if (event.composedPath().some((target) => target instanceof Element && isFragmintUnityCanvasElement(target)))
+    return true
+  const active = document.activeElement
+  return active instanceof Element && isFragmintUnityCanvasElement(active)
 }
 
 export function hasDocumentTextSelection(): boolean {

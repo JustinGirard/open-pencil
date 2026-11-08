@@ -118,7 +118,9 @@ export function createCanvasSurfaceManager({
     const surface = result.surface
     if (!surface) {
       canvas.dataset.surfaceError = 'webgl'
-      return
+      throw new Error(
+        `WebGL initialization failed: ${result.error ?? 'unknown surface initialization failure'}`
+      )
     }
 
     const glCtx = canvas.getContext('webgl2') ?? null

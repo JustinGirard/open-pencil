@@ -1,14 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { pluginRoutes } from '@/app/plugins/pluginRegistry'
 import WorkspaceView from './views/WorkspaceView.vue'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', component: WorkspaceView },
     { path: '/storage', redirect: '/' },
     { path: '/demo', component: WorkspaceView, meta: { demo: true } },
-    { path: '/share/:roomId', component: WorkspaceView }
+    { path: '/share/:roomId', component: WorkspaceView },
+    ...pluginRoutes
   ]
 })
 

@@ -78,6 +78,7 @@ export function makeGLSurface(
 ): {
   surface: Surface | null
   glContext: GLContext | null
+  error: string | null
   /**
    * The WebGL context this call registered with CanvasKit, which the caller must release with
    * `deleteContext`: CanvasKit's context table otherwise keeps the canvas, and everything its
@@ -90,9 +91,16 @@ export function makeGLSurface(
   const glAttrs = options?.preserveDrawingBuffer ? { preserveDrawingBuffer: 1 } : undefined
   const handle = context ? null : ck.GetWebGLContext(canvas, glAttrs)
   if (!context && !handle) {
-    return { surface: null, glContext: context, glHandle: null, presentation: null }
+    return {
+      surface: null,
+      glContext: context,
+      glHandle: null,
+      presentation: null,
+      error: 'CanvasKit failed to acquire a WebGL context handle'
+    }
   }
 
+  const requestedColorSpace = documentColorSpace
   const buffer = canvas.getContext('webgl2') ?? canvas.getContext('webgl')
   const presentation = configurePresentation(buffer, {
     documentColorSpace,
@@ -102,23 +110,37 @@ export function makeGLSurface(
   })
   if (!presentation) {
     if (handle) ck.deleteContext(handle)
-    return { surface: null, glContext: context, glHandle: null, presentation: null }
+    return {
+      surface: null,
+      glContext: context,
+      glHandle: null,
+      presentation: null,
+      error: `Canvas presentation setup failed for document color space "${requestedColorSpace}"`
+    }
   }
   if (!context && handle) context = ck.MakeGrContext(handle)
   if (!context) {
     if (handle) ck.deleteContext(handle)
-    return { surface: null, glContext: context, glHandle: null, presentation: null }
+    return {
+      surface: null,
+      glContext: context,
+      glHandle: null,
+      presentation: null,
+      error: 'CanvasKit failed to create a GPU rendering context'
+    }
   }
 
+  const surface = ck.MakeOnScreenGLSurface(
+    context,
+    canvas.width,
+    canvas.height,
+    presentation === 'display-p3' ? ck.ColorSpace.DISPLAY_P3 : ck.ColorSpace.SRGB
+  )
   return {
-    surface: ck.MakeOnScreenGLSurface(
-      context,
-      canvas.width,
-      canvas.height,
-      presentation === 'display-p3' ? ck.ColorSpace.DISPLAY_P3 : ck.ColorSpace.SRGB
-    ),
+    surface,
     glContext: context,
     glHandle: handle,
-    presentation
+    presentation,
+    error: surface ? null : 'CanvasKit failed to create the on-screen GL surface'
   }
 }

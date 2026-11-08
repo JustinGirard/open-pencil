@@ -13,6 +13,7 @@ import { APP_MENU_SCHEMA, type AppMenuEntry } from '@/app/shell/menu/schema'
 import { SHELL_MENU_IDS } from '@/app/shell/menu/shell'
 import { useAppTheme } from '@/app/shell/theme'
 import { saveDocumentToStorage } from '@/app/storage/workspace/save'
+import { saveAsInFragmint, saveInFragmint } from '@/app/plugins/fragmint/storage/saveCommands'
 import { createTab, closeTab, activeTab } from '@/app/tabs'
 import { isTauri } from '@/app/tauri/env'
 
@@ -44,6 +45,8 @@ export function useEditorMenu() {
     },
     save: () => void store.saveFigFile(),
     'save-as': () => void store.saveFigFileAs(),
+    'save-in-fragmint': () => void saveInFragmint(store),
+    'save-as-in-fragmint': () => void saveAsInFragmint(store),
     'save-to-storage': () => void saveDocumentToStorage(store),
     'export-selection': () => {
       if (store.state.selectedIds.size > 0) void store.exportSelection(1, 'png')
