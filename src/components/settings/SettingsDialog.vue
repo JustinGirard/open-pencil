@@ -11,6 +11,7 @@ import {
   settingsDialogSection,
   type SettingsSection
 } from '@/app/settings/dialog'
+import { pluginSettingsAreas } from '@/app/plugins/pluginRegistry'
 import { provideSettingsNavigation } from '@/app/settings/navigation/use'
 import ChatSettingsSection from '@/components/settings/chat/ChatSettingsSection.vue'
 import DiagnosticsSettingsPanel from '@/components/settings/diagnostics/DiagnosticsSettingsPanel.vue'
@@ -44,7 +45,7 @@ tryOnScopeDispose(registerSettingsNavigation(navigation.request))
 const { editing, confirming } = navigation
 const sections = computed(
   () =>
-    [
+    ([
       { value: 'general', label: settings.value.general },
       { value: 'toolbar', label: settings.value.toolbar },
       { value: 'ai', label: settings.value.aiAndAgents },
@@ -55,10 +56,15 @@ const sections = computed(
       { value: 'tools', label: settings.value.toolAccess },
       { value: 'media', label: settings.value.media },
       { value: 'storage', label: settings.value.storage }
-    ] satisfies { value: SettingsSection; label: string }[]
+    ] satisfies { value: SettingsSection; label: string }[]).concat(
+      pluginSettingsAreas.map((area) => ({
+        value: area.id,
+        label: area.label
+      }))
+    )
 )
 function onSectionChange(section: string | number): void {
-  const match = sections.value.find((item) => item.value === section)
+  const match = sections.value.find((item) => item.value === String(section))
   if (!match || match.value === settingsDialogSection.value) return
   navigation.request(() => {
     settingsDialogSection.value = match.value
@@ -143,6 +149,15 @@ function onOpenChange(open: boolean): void {
           <template #leading><icon-lucide-cloud class="size-3.5" /></template>
           {{ settings.storage }}
         </AppTabsTrigger>
+        <AppTabsTrigger
+          v-for="area in pluginSettingsAreas"
+          :key="area.id"
+          :value="area.id"
+          :data-test-id="`settings-section-${area.id}`"
+        >
+          <template #leading><icon-lucide-puzzle class="size-3.5" /></template>
+          {{ area.label }}
+        </AppTabsTrigger>
       </AppTabsList>
 
       <AppTabsContent value="general" as-child>
@@ -178,6 +193,14 @@ function onOpenChange(open: boolean): void {
       </AppTabsContent>
       <AppTabsContent value="storage" as-child>
         <StorageSettingsPanel />
+      </AppTabsContent>
+      <AppTabsContent v-for="area in pluginSettingsAreas" :key="area.id" :value="area.id" as-child>
+        <SettingsPage>
+          <component
+            :is="area.component"
+            :data-test-id="`settings-plugin-panel-${area.id}`"
+          />
+        </SettingsPage>
       </AppTabsContent>
     </AppTabsRoot>
 

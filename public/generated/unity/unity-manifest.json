@@ -1,0 +1,11 @@
+{
+  "loaderUrl": "/generated/unity/Build/FragmintWeb.loader.js",
+  "dataUrl": "/generated/unity/Build/FragmintWeb.data.gz",
+  "frameworkUrl": "/generated/unity/Build/FragmintWeb.framework.js.gz",
+  "codeUrl": "/generated/unity/Build/FragmintWeb.wasm.gz",
+  "streamingAssetsUrl": "/generated/unity/StreamingAssets",
+  "companyName": "Fragmint",
+  "productName": "FragmintWeb",
+  "productVersion": "dev",
+  "matchWebGLToCanvasSize": true
+}

@@ -1,27 +1,21 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, withDefaults } from 'vue'
 
 import { brandMark } from '@/theme/brand'
 
 import type { BrandMarkProps } from './types'
 
 const {
-  variant = 'micro',
-  appearance = 'light',
-  decorative = false,
+  decorative,
   class: className
-} = defineProps<BrandMarkProps>()
+} = withDefaults(defineProps<BrandMarkProps>(), {
+  variant: 'micro',
+  appearance: 'light',
+  decorative: false
+})
 
-const sources = {
-  mark: 'mark',
-  micro: 'mark-micro',
-  mono: 'mark-mono',
-  'app-icon': 'app-icon'
-} as const
 const source = computed(() => {
-  // The ivory tile owns its background and always uses the light palette.
-  const suffix = variant !== 'app-icon' && appearance === 'dark' ? '-dark' : ''
-  return `/brand/${sources[variant]}${suffix}.svg`
+  return '/brand/fragmint-fragment-logo-small.png'
 })
 </script>
 
@@ -29,7 +23,7 @@ const source = computed(() => {
   <img
     :src="source"
     :class="brandMark({ class: className })"
-    :alt="decorative ? '' : 'OpenPencil'"
+    :alt="decorative ? '' : 'Fragmint'"
     width="16"
     height="16"
   />

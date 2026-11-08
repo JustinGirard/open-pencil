@@ -24,7 +24,8 @@ import { notificationMessages } from '@/app/i18n/notifications'
 import {
   activeStorageProviderID,
   createActiveStorageAdapter,
-  type StorageDocument
+  type StorageDocument,
+  type StorageProviderID
 } from '@/app/integrations/storage'
 import {
   cacheRecentFileThumbnail,
@@ -310,8 +311,11 @@ function failPreparation(
   })
 }
 
-export async function openStorageDocumentInNewTab(document: StorageDocument): Promise<void> {
-  const providerId = activeStorageProviderID.value
+export async function openStorageDocumentInNewTab(
+  document: StorageDocument,
+  providerID?: StorageProviderID
+): Promise<void> {
+  const providerId = providerID ?? activeStorageProviderID.value
   const existing = findStorageTab(providerId, document.id)
   if (existing) {
     switchTab(existing.id)

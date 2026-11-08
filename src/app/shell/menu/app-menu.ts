@@ -44,6 +44,7 @@ import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import { openFileDialog } from '@/app/shell/menu/use'
 import { useAppTheme } from '@/app/shell/theme'
 import { saveDocumentToStorage } from '@/app/storage/workspace/save'
+import { saveAsInFragmint, saveInFragmint } from '@/app/plugins/fragmint/storage/saveCommands'
 import { closeTab, activeTab } from '@/app/tabs'
 
 export interface AppMenuGroup {
@@ -177,6 +178,8 @@ export function useAppMenu() {
     },
     save: () => void store.saveFigFile(),
     'save-as': () => void store.saveFigFileAs(),
+    'save-in-fragmint': () => void saveInFragmint(store),
+    'save-as-in-fragmint': () => void saveAsInFragmint(store),
     'save-to-storage': () => void saveDocumentToStorage(store),
     'export-selection': () => exportSelection('png'),
     ...createSelectionMenuActions(store),

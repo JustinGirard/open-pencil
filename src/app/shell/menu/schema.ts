@@ -82,6 +82,8 @@ export const APP_MENU_SCHEMA = [
       { type: 'separator' },
       { id: 'save', label: 'Save', shortcut: 'MOD+S' },
       { id: 'save-as', label: 'Save As…', shortcut: 'MOD+SHIFT+S' },
+      { id: 'save-in-fragmint', label: 'Save in Fragmint' },
+      { id: 'save-as-in-fragmint', label: 'Save As in Fragmint…' },
       { id: 'save-to-storage', label: 'Save to Storage…' },
       { type: 'separator' },
       {

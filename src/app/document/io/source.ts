@@ -13,7 +13,11 @@ import { createDocumentSourceState } from '@/app/document/io/source-state'
 import type { DocumentSourceAccess } from '@/app/document/io/types'
 import { createDocumentRecovery } from '@/app/document/recovery'
 import { recoveryEnabled } from '@/app/document/recovery/preferences'
-import type { StorageDocumentBinding, StorageProviderID } from '@/app/integrations/storage/types'
+import type {
+  StorageDocumentBinding,
+  StorageDocumentMetadata,
+  StorageProviderID
+} from '@/app/integrations/storage/types'
 import { createCanvasId } from '@/app/storage/id'
 import { trackDocumentFormat } from '@/app/telemetry'
 
@@ -170,11 +174,7 @@ export function createDocumentSourceActions({
 
   let retargeting = false
 
-  /**
-   * Save to a new target; when the write fails, the document keeps the source it had. A second
-   * retarget while one is in flight is refused, so a failure never restores another save's target.
-   */
-  async function saveToNewTarget(planTarget: () => void): Promise<boolean> {
+  async function saveToNewTargetWith(planTarget: () => void, saveCurrent: () => Promise<boolean>) {
     if (retargeting) return false
     retargeting = true
     const previous = {
@@ -194,7 +194,7 @@ export function createDocumentSourceActions({
     }
     planTarget()
     try {
-      const saved = await saveAndTrack(saveFigFile)
+      const saved = await saveCurrent()
       if (!saved) restore()
       return saved
     } catch (error) {
@@ -203,6 +203,14 @@ export function createDocumentSourceActions({
     } finally {
       retargeting = false
     }
+  }
+
+  /**
+   * Save to a new target; when the write fails, the document keeps the source it had. A second
+   * retarget while one is in flight is refused, so a failure never restores another save's target.
+   */
+  async function saveToNewTarget(planTarget: () => void): Promise<boolean> {
+    return saveToNewTargetWith(planTarget, () => saveAndTrack(saveFigFile))
   }
 
   async function saveFigFileToPath(path: string): Promise<boolean> {
@@ -227,6 +235,52 @@ export function createDocumentSourceActions({
     return saved
   }
 
+  function toFigDownloadName(name: string): string {
+    return /\.fig$/i.test(name) ? name : `${name}.fig`
+  }
+
+  async function saveFigFileToStorageDocument(
+    providerId: StorageProviderID,
+    documentId: string,
+    documentName: string,
+    persistDocument: (figBytes: Uint8Array, metadata: StorageDocumentMetadata) => Promise<void>
+  ): Promise<boolean> {
+    const saveCurrent = async (): Promise<boolean> => {
+      const revision = changes.capture()
+      const figBytes = await buildFigFile()
+      await persistDocument(figBytes, {
+        name: documentName,
+        updatedAt: new Date().toISOString()
+      })
+      setLastWriteTime(Date.now())
+      changes.markSaved(revision)
+      setSavedVersion(revision)
+      try {
+        await recovery.markProtectedVersion(revision)
+      } catch (error) {
+        console.warn('[Recovery] Cleanup after document write failed:', error)
+      }
+      return true
+    }
+
+    const saved = await saveToNewTargetWith(
+      () => {
+        stopWatchingFile()
+        setFileHandle(null)
+        setFilePath(null)
+        setDownloadName(toFigDownloadName(documentName))
+        setStorageBinding({ providerId, documentId })
+        state.documentName = documentName
+      },
+      saveCurrent
+    )
+    if (saved) {
+      setSourceIdentity({ handle: null, path: null })
+      state.autosaveEnabled = true
+    }
+    return saved
+  }
+
   function startWatchingCurrentFile() {
     void startWatchingFile()
   }
@@ -244,6 +298,7 @@ export function createDocumentSourceActions({
     setPlannedFilePath,
     saveFigFileToPath,
     saveFigFileToStorage,
+    saveFigFileToStorageDocument,
     startWatchingCurrentFile,
     disposeDocumentIO,
     saveFigFile: () => saveAndTrack(saveFigFile),

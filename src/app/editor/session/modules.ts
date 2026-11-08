@@ -96,6 +96,7 @@ export function createEditorStoreModules(
     setPlannedFilePath: documentIO.setPlannedFilePath,
     saveFigFileToPath: documentIO.saveFigFileToPath,
     saveFigFileToStorage: documentIO.saveFigFileToStorage,
+    saveFigFileToStorageDocument: documentIO.saveFigFileToStorageDocument,
     startWatchingCurrentFile: documentIO.startWatchingCurrentFile,
     designCheck,
     dispose: () => {

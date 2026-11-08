@@ -2,10 +2,13 @@
 import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { formatShortcut, useI18n, useViewportKind } from '@open-pencil/vue'
 
 import { provideTabEditorStore } from '@/app/editor/active-store'
+import { resolveCenterView, resolveWorkspaceVisibility } from '@/app/plugins/base/runtime'
+import { plugins } from '@/app/plugins/pluginRegistry'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { loadEditorLayout, saveEditorLayout } from '@/app/shell/layout-storage'
 import { appMenuShortcut } from '@/app/shell/menu/shortcut'
@@ -19,6 +22,7 @@ import EditorCanvas from '@/components/EditorCanvas.vue'
 import LayersPanel from '@/components/LayersPanel.vue'
 import MobileDrawer from '@/components/MobileDrawer.vue'
 import MobileHud from '@/components/MobileHud/MobileHud.vue'
+import PluginCenterOverride from '@/app/plugins/mounts/PluginCenterOverride.vue'
 import PropertiesPanel from '@/components/PropertiesPanel.vue'
 import Toolbar from '@/components/toolbar/Toolbar.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -28,6 +32,7 @@ import splitterTheme from '@/theme/splitter'
 import WorkspacePill from './WorkspacePill.vue'
 
 const showChrome = appRuntimeConfig.showChrome
+const route = useRoute()
 /**
  * The document tab this workspace edits. WorkspaceView keys the workspace by tab, so the tab and
  * its store are fixed for its lifetime, and its editor UI stays bound to that document rather
@@ -44,6 +49,10 @@ const playingAlone = computed(() => store.state.play !== null && store.visiblePa
 const { editor } = useI18n()
 // Until a room's document arrives there is nothing to edit, so its screen replaces the editor.
 const { pending: roomPending } = useRoomActions()
+const centerOverrideActive = computed(() => !!resolveCenterView(plugins, { route }))
+const workspaceVisibility = computed(() => resolveWorkspaceVisibility(plugins, { route }))
+const hidePagesAndLayers = computed(() => workspaceVisibility.value.hidePagesAndLayers === true)
+const hideRightPanel = computed(() => workspaceVisibility.value.hideRightPanel === true)
 </script>
 
 <template>
@@ -65,7 +74,7 @@ const { pending: roomPending } = useRoomActions()
       :max-size="30"
       class="flex"
     >
-      <LayersPanel />
+      <LayersPanel :hide-pages-and-layers="hidePagesAndLayers" />
     </SplitterPanel>
     <SplitterResizeHandle
       data-test-id="left-splitter-handle"
@@ -77,13 +86,15 @@ const { pending: roomPending } = useRoomActions()
       <div class="relative flex min-w-0 flex-1">
         <CanvasSplitRoot />
         <ActiveRoomOverlay />
-        <Toolbar />
+        <PluginCenterOverride />
+        <Toolbar v-if="!centerOverrideActive" />
       </div>
     </SplitterPanel>
-    <SplitterResizeHandle :class="horizontalSplitterStyles.handle()">
+    <SplitterResizeHandle v-show="!hideRightPanel" :class="horizontalSplitterStyles.handle()">
       <div :class="horizontalSplitterStyles.divider()" />
     </SplitterResizeHandle>
     <SplitterPanel
+      v-show="!hideRightPanel"
       id="properties"
       :default-size="initialEditorLayout[2]"
       :min-size="10"

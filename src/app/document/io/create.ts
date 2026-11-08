@@ -87,6 +87,7 @@ export function createDocumentIOActions(
     setPlannedFilePath: sourceActions.setPlannedFilePath,
     saveFigFileToPath: sourceActions.saveFigFileToPath,
     saveFigFileToStorage: sourceActions.saveFigFileToStorage,
+    saveFigFileToStorageDocument: sourceActions.saveFigFileToStorageDocument,
     startWatchingCurrentFile: sourceActions.startWatchingCurrentFile,
     disposeDocumentIO: sourceActions.disposeDocumentIO,
     openFigFile,

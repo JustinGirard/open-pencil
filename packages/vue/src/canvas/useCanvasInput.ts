@@ -47,7 +47,8 @@ export function useCanvasInput(
   hitTestFrameTitle: (cx: number, cy: number) => SceneNode | null,
   onCursorMove?: (cx: number, cy: number) => void,
   onActivate?: () => void,
-  isEnabled: () => boolean = () => true
+  isEnabled: () => boolean = () => true,
+  interceptSpace = true
 ) {
   const drag = ref<DragState | null>(null)
   // Canvas chrome that explains layout, such as auto layout child outlines, steps aside while
@@ -477,7 +478,7 @@ export function useCanvasInput(
   )
   // Space during a move keeps layers in their parents, as in Figma, instead of switching to the hand.
   function holdParentsDuringMove(event: KeyboardEvent, held: boolean) {
-    if (event.code !== 'Space' || drag.value?.type !== 'move' || !isEnabled()) return
+    if (!interceptSpace || event.code !== 'Space' || drag.value?.type !== 'move' || !isEnabled()) return
     event.preventDefault()
     event.stopImmediatePropagation()
     drag.value.keepParents = held

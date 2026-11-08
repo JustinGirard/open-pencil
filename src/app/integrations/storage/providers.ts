@@ -1,4 +1,5 @@
 import { defineStorageProvider, StorageProviderRegistry } from './registry'
+import { createFragmintStorageAdapter } from '@/app/plugins/fragmint/storage/adapter'
 import { createS3StorageAdapter } from './s3/adapter'
 
 export const S3_STORAGE_PROVIDER = defineStorageProvider({
@@ -17,4 +18,16 @@ export const S3_STORAGE_PROVIDER = defineStorageProvider({
   createAdapter: createS3StorageAdapter
 })
 
-export const storageProviderRegistry = new StorageProviderRegistry([S3_STORAGE_PROVIDER])
+export const FRAGMINT_STORAGE_PROVIDER = defineStorageProvider({
+  id: 'fragmint',
+  label: 'Fragmint storage',
+  description: 'Fragmint Node MCP FieldSet storage',
+  preferenceFields: [],
+  credentialFields: [],
+  createAdapter: createFragmintStorageAdapter
+})
+
+export const storageProviderRegistry = new StorageProviderRegistry([
+  S3_STORAGE_PROVIDER,
+  FRAGMINT_STORAGE_PROVIDER
+])

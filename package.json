@@ -46,6 +46,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:node24": "bash ./scripts/dev-node24.sh",
     "dev:portless": "portless run vite",
     "build": "bun run build:packages && bun run lint && vite build",
     "preview": "vite preview",

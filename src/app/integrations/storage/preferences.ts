@@ -9,6 +9,9 @@ export const activeStorageProviderID = useLocalStorage<StorageProviderID>(
   'open-pencil:storage:provider',
   's3-compatible'
 )
+console.info('[Storage] active provider initialized', {
+  providerId: activeStorageProviderID.value
+})
 
 const storedPreferences = useLocalStorage<StoragePreferences>('open-pencil:storage:preferences', {})
 

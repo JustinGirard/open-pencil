@@ -27,10 +27,12 @@ import { createDevServerOptions } from './vite/server'
 
 const host = process.env.TAURI_DEV_HOST
 const automationRoute = localAutomationRoute(host)
+const openPencilBasePath = process.env.OPEN_PENCIL_BASE_PATH ?? '/'
 
 export default defineConfig(async ({ command }) => {
   await Promise.all([ensureBrandAssets(['web']), ensureDemoDocument()])
   return {
+    base: openPencilBasePath,
     resolve: {
       alias: createOpenPencilAliases(__dirname)
     },

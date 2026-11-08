@@ -55,6 +55,11 @@ const MAX_CONFIGURATION_BYTES = 70_000
 const CHILD_EXIT_TIMEOUT_MS = 2_000
 const CHILD_HEALTH_ATTEMPTS = 200
 const CHILD_HEALTH_DELAY_MS = 50
+const OPEN_PENCIL_BASE_PATH = process.env.OPEN_PENCIL_BASE_PATH ?? '/'
+const DEV_MCP_RESTART_MOUNT_PATH =
+  OPEN_PENCIL_BASE_PATH === '/'
+    ? DEV_MCP_RESTART_PATH
+    : `${OPEN_PENCIL_BASE_PATH.replace(/\/$/, '')}${DEV_MCP_RESTART_PATH}`
 
 type DevMCPConfigurationErrorStatus = 400 | 413
 
@@ -269,7 +274,7 @@ export function automationPlugin(
   return {
     name: 'open-pencil-automation',
     async configureServer(server) {
-      server.middlewares.use(DEV_MCP_RESTART_PATH, (request, response, next) => {
+      const handleDevMCPRestart = (request, response, next) => {
         if (request.method !== 'POST') {
           next()
           return
@@ -296,7 +301,11 @@ export function automationPlugin(
             response.end(error instanceof Error ? error.message : String(error))
           }
         })()
-      })
+      }
+      server.middlewares.use(DEV_MCP_RESTART_PATH, handleDevMCPRestart)
+      if (DEV_MCP_RESTART_MOUNT_PATH !== DEV_MCP_RESTART_PATH) {
+        server.middlewares.use(DEV_MCP_RESTART_MOUNT_PATH, handleDevMCPRestart)
+      }
       await enqueue(startChild)
     },
     async buildEnd() {
