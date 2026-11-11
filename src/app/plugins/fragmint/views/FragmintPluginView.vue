@@ -6,7 +6,7 @@ import FragmintUnityHost from '@/app/plugins/fragmint/views/FragmintUnityHost.vu
   <div class="flex h-screen w-screen flex-col gap-3 p-4">
     <div class="flex items-center gap-2">
       <img
-        src="/brand/fragmint-fragment-logo-small.png"
+        :src="'/brand/fragmint-fragment-logo-small.png'"
         alt="Fragmint"
         class="h-5 w-5 rounded-sm object-cover"
       />
