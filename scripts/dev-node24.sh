@@ -3,8 +3,10 @@ set -euo pipefail
 
 NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 if [ ! -s "$NVM_DIR/nvm.sh" ]; then
-  echo "nvm not found at $NVM_DIR/nvm.sh"
-  echo "Install nvm, then run: nvm install 24"
+  if command -v node >/dev/null 2>&1 && [[ "$(node --version)" == v24.* ]]; then
+    exec bun run dev
+  fi
+  echo "Node 24 is required; install nvm and run: nvm install 24"
   exit 1
 fi
 
