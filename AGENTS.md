@@ -1,5 +1,8 @@
 # OpenPencil
 
+For Python tooling, activate `/home/justin/projects/venv` by default unless
+that tool explicitly requires another environment; the Bun commands below are unchanged.
+
 Vue 3 + CanvasKit (Skia WASM) + Yoga WASM design editor. Tauri v2 desktop, also runs in browser. Bun workspace monorepo.
 
 This file holds the repository map and the rules that apply everywhere. Rules for one folder live in that folder's `AGENTS.md`. **Before changing files under a mapped path, read this file and that path's guide.** Paths in every guide are repository-relative. Process for humans (setup, PRs, commits) is in `CONTRIBUTING.md`; product direction and Figma gaps are in `packages/docs/development/roadmap.md`.
